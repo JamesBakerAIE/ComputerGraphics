@@ -6,7 +6,8 @@
 #include "Shader.h"
 #include "OBJMesh.h"
 
-class Application3D : public aie::Application {
+class Application3D : public aie::Application 
+{
 public:
 
 	Application3D();
@@ -23,11 +24,20 @@ protected:
 	glm::mat4	m_viewMatrix;
 	glm::mat4	m_projectionMatrix;
 
+	aie::ShaderProgram m_phongShader;
 	aie::ShaderProgram m_shader;
+	
 	Mesh m_quadMesh;
 	glm::mat4 m_quadTransform;
 
 	aie::OBJMesh m_bunnyMesh;
 	glm::mat4 m_bunnyTransform;
 
+	struct Light
+	{
+		glm::vec3 direction;
+		glm::vec3 colour;
+	};
+	Light m_light;
+	glm::vec3 m_ambientLight;
 };
