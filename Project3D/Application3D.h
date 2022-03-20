@@ -5,6 +5,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "OBJMesh.h"
+#include "Camera.h"
 
 class Application3D : public aie::Application 
 {
@@ -40,4 +41,6 @@ protected:
 	};
 	Light m_light;
 	glm::vec3 m_ambientLight;
+
+	Camera m_camera;
 };

@@ -4,6 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <gl_core_4_4.h>
+#include <imgui.h>
+
 
 using glm::vec3;
 using glm::vec4;
@@ -105,21 +107,15 @@ void Application3D::update(float deltaTime)
 	// add a transform so that we can see the axis
 	Gizmos::addTransform(mat4(1));
 
-	//// demonstrate a few shapes
-	//Gizmos::addAABBFilled(vec3(0), vec3(1), vec4(0, 0.5f, 1, 0.25f));
-	//Gizmos::addSphere(vec3(5, 0, 5), 1, 8, 8, vec4(1, 0, 0, 0.5f));
-	//Gizmos::addRing(vec3(5, 0, -5), 1, 1.5f, 8, vec4(0, 1, 0, 1));
-	//Gizmos::addDisk(vec3(-5, 0, 5), 1, 16, vec4(1, 1, 0, 1));
-	//Gizmos::addArc(vec3(-5, 0, -5), 0, 2, 1, 8, vec4(1, 0, 1, 1));
+	m_camera.update(deltaTime);
 
-	//mat4 t = glm::rotate(mat4(1), time, glm::normalize(vec3(1, 1, 1)));
-	//t[3] = vec4(-2, 0, 0, 1);
-	//Gizmos::addCylinderFilled(vec3(0), 0.5f, 1, 5, vec4(0, 1, 1, 1), &t);
 
-	//// demonstrate 2D gizmos
-	//Gizmos::add2DAABB(glm::vec2(getWindowWidth() / 2, 100),
-	//				  glm::vec2(getWindowWidth() / 2 * (fmod(getTime(), 3.f) / 3), 20),
-	//				  vec4(0, 1, 1, 1));
+	ImGui::Begin("Light Settings");
+	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.0f,
+		1.0f);
+	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.0f,
+		2.0f);
+	ImGui::End();
 
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
@@ -134,9 +130,13 @@ void Application3D::draw() {
 	clearScreen();
 
 	// update perspective in case window resized
-	m_projectionMatrix = glm::perspective(glm::pi<float>() * 0.25f,
-		getWindowWidth() / (float)getWindowHeight(),
-		0.1f, 1000.f);
+	m_projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(), getWindowHeight());
+	m_viewMatrix = m_camera.getViewMatrix();
+	// bind shader
+	m_shader.bind();
+	// bind transform
+	auto pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
+	m_shader.bindUniform("ProjectionViewModel", pvm);
 
 	//// bind shader
 	//m_shader.bind();
@@ -159,8 +159,11 @@ void Application3D::draw() {
 	m_phongShader.bindUniform("LightDirection", m_light.direction);
 
 	
-	// bind transform
-	auto pvm = m_projectionMatrix * m_viewMatrix * m_bunnyTransform;
+	//// bind transform
+	//glm::mat4 projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(),
+	//	(float)getWindowHeight());
+	//glm::mat4 viewMatrix = m_camera.getViewMatrix();
+	pvm = m_projectionMatrix * m_viewMatrix * m_bunnyTransform;
 	m_phongShader.bindUniform("ProjectionViewModel", pvm);
 	
 	// bind transforms for lighting
