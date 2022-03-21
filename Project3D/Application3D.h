@@ -25,14 +25,23 @@ protected:
 	glm::mat4	m_viewMatrix;
 	glm::mat4	m_projectionMatrix;
 
+	aie::Texture m_gridTexture;
+
+	aie::ShaderProgram m_texturedShader;
 	aie::ShaderProgram m_phongShader;
 	aie::ShaderProgram m_shader;
-	
+	aie::ShaderProgram m_normalMapShader;
+
+
 	Mesh m_quadMesh;
 	glm::mat4 m_quadTransform;
 
 	aie::OBJMesh m_bunnyMesh;
 	glm::mat4 m_bunnyTransform;
+
+	aie::OBJMesh m_spearMesh;
+	glm::mat4 m_spearTransform;
+
 
 	struct Light
 	{

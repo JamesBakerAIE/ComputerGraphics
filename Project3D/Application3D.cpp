@@ -36,21 +36,34 @@ bool Application3D::startup() {
 	m_light.colour = { 1, 1, 0 };
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 
+	m_texturedShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/textured.vert");
+	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/textured.frag");
+	if (m_texturedShader.link() == false) {
+		printf("Shader Error: %s\n",
+			m_texturedShader.getLastError());
+		return false;
+	}
+	if (m_gridTexture.load("./textures/numbered_grid.tga") == false) {
+		printf("Failed to load texture!\n");
+		return false;
+	}
+
 	m_shader.loadShader(aie::eShaderStage::VERTEX,
 		"./shaders/simple.vert");
 	m_shader.loadShader(aie::eShaderStage::FRAGMENT,
 		"./shaders/simple.frag");
-
-	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
-		"./shaders/phong.vert");
-	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
-		"./shaders/phong.frag");
-
 	if (m_shader.link() == false) {
 		printf("Shader Error: %s\n", m_shader.getLastError());
 		return false;
 	}
 
+
+	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/phong.vert");
+	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/phong.frag");
 	if (m_phongShader.link() == false) {
 		printf("Shader Error: %s\n", m_shader.getLastError());
 		return false;
@@ -67,6 +80,31 @@ bool Application3D::startup() {
 	0,0,0.5f,0,
 	0,0,0,1
 	};
+
+
+	// create a simple quad
+	m_quadMesh.initialiseQuad();
+	// define a scale matrix for the quad
+	m_quadTransform = {
+	10,0,0,0,
+	0,10,0,0,
+	0,0,10,0,
+	0,0,0,1
+	};
+
+
+	if (m_spearMesh.load("./soulspear/soulspear.obj",
+		true, true) == false) {
+		printf("Soulspear Mesh Error!\n");
+		return false;
+	}
+	m_spearTransform = {
+	1,0,0,0,
+	0,1,0,0,
+	0,0,1,0,
+	0,0,0,1
+	};
+
 
 	return true;
 }
@@ -133,10 +171,10 @@ void Application3D::draw() {
 	m_projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(), getWindowHeight());
 	m_viewMatrix = m_camera.getViewMatrix();
 	// bind shader
-	m_shader.bind();
+	//m_shader.bind();
 	// bind transform
-	auto pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
-	m_shader.bindUniform("ProjectionViewModel", pvm);
+	//auto pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
+	//m_shader.bindUniform("ProjectionViewModel", pvm);
 
 	//// bind shader
 	//m_shader.bind();
@@ -163,14 +201,38 @@ void Application3D::draw() {
 	//glm::mat4 projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(),
 	//	(float)getWindowHeight());
 	//glm::mat4 viewMatrix = m_camera.getViewMatrix();
-	pvm = m_projectionMatrix * m_viewMatrix * m_bunnyTransform;
+	auto pvm = m_projectionMatrix * m_viewMatrix * m_bunnyTransform;
 	m_phongShader.bindUniform("ProjectionViewModel", pvm);
 	
 	// bind transforms for lighting
 	m_phongShader.bindUniform("ModelMatrix", m_bunnyTransform);
 	
 	// draw bunny
-	m_bunnyMesh.draw();
+	//m_bunnyMesh.draw();
+
+	m_texturedShader.bind();
+	// bind transform
+	pvm = m_projectionMatrix * m_viewMatrix * m_spearTransform;
+	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+	// draw mesh
+	//m_spearMesh.draw();
+
+
+
+
+
+	//// bind shader
+	//m_texturedShader.bind();
+	//// bind transform
+	//pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
+	//m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+	//// bind texture location
+	//m_texturedShader.bindUniform("diffuseTexture", 1);
+	//// bind texture to specified location
+	//m_gridTexture.bind(1);
+	//// draw quad
+	//m_quadMesh.draw();
+
 	
 	// draw 3D gizmos
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);
