@@ -65,9 +65,22 @@ bool Application3D::startup() {
 	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
 		"./shaders/phong.frag");
 	if (m_phongShader.link() == false) {
-		printf("Shader Error: %s\n", m_shader.getLastError());
+		printf("Shader Error: %s\n", m_phongShader.getLastError());
 		return false;
 	}
+
+
+	m_normalMapShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/normalmap.vert");
+	m_normalMapShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/normalmap.frag");
+	if (m_normalMapShader.link() == false) {
+		printf("Shader Error: %s\n", m_normalMapShader.getLastError());
+		return false;
+	}
+
+
+
 
 	if (m_bunnyMesh.load("./stanford/Bunny.obj") == false) {
 		printf("Bunny Mesh Error!\n");
@@ -118,10 +131,13 @@ void Application3D::update(float deltaTime)
 {
 
 	// query time since application started
-	float time = getTime();
-	// rotate light
-	m_light.direction = glm::normalize(vec3(glm::cos(time * 2),
-		glm::sin(time * 2), 0));
+	//float time = getTime();
+	//
+	//float time = 1;
+
+	//// rotate light
+	//m_light.direction = glm::normalize(vec3(glm::cos(time * 2),
+	//	glm::sin(time * 2), 0));
 
 	//// rotate camera
 	//m_viewMatrix = glm::lookAt(vec3(glm::sin(time) * 10, 10, glm::cos(time) * 10),
@@ -210,12 +226,20 @@ void Application3D::draw() {
 	// draw bunny
 	//m_bunnyMesh.draw();
 
-	m_texturedShader.bind();
+	m_normalMapShader.bind();
 	// bind transform
 	pvm = m_projectionMatrix * m_viewMatrix * m_spearTransform;
-	m_texturedShader.bindUniform("ProjectionViewModel", pvm);
+	m_normalMapShader.bindUniform("ProjectionViewModel", pvm);
+	m_normalMapShader.bindUniform("ModelMatrix", m_spearTransform);
+
+	m_normalMapShader.bindUniform("AmbientColour", m_ambientLight);
+	m_normalMapShader.bindUniform("LightColour", m_light.colour);
+	m_normalMapShader.bindUniform("LightDirection", m_light.direction);
+
+	m_normalMapShader.bindUniform("cameraPosition", m_camera.getPosition());
+	
 	// draw mesh
-	//m_spearMesh.draw();
+	m_spearMesh.draw();
 
 
 

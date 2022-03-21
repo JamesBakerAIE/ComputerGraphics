@@ -26,34 +26,36 @@ void Camera::update(float deltaTime)
 	glm::vec3 right(-sin(thetaR), 0, cos(thetaR));
 	glm::vec3 up(0, 1, 0);
 
+	const float moveSpeed = 10;
+
 	// use WASD, ZX keys to move camera around
 	if (input->isKeyDown(aie::INPUT_KEY_X))
 	{
-		m_position += up * deltaTime;
+		m_position += up * deltaTime * moveSpeed;
 	}
 
 	if (input->isKeyDown(aie::INPUT_KEY_Z))
 	{
-		m_position += -up * deltaTime;
+		m_position += -up * deltaTime * moveSpeed;
 	}
 
 	if (input->isKeyDown(aie::INPUT_KEY_W))
 	{
-		m_position += forward * deltaTime;
+		m_position += forward * deltaTime * moveSpeed;
 	}
 	if (input->isKeyDown(aie::INPUT_KEY_S))
 	{
-		m_position += -forward * deltaTime;
+		m_position += -forward * deltaTime * moveSpeed;
 	}
 
 	if (input->isKeyDown(aie::INPUT_KEY_D))
 	{
-		m_position += right * deltaTime;
+		m_position += right * deltaTime * moveSpeed;
 	}
 
 	if (input->isKeyDown(aie::INPUT_KEY_A))
 	{
-		m_position += -right * deltaTime;
+		m_position += -right * deltaTime * moveSpeed;
 	}
 
 

@@ -10,6 +10,12 @@ public:
 
 	glm::mat4 getViewMatrix();
 
+
+	glm::vec3 getPosition()
+	{
+		return m_position;
+	}
+
 	glm::mat4 getProjectionMatrix(float w, float h);
 
 protected:
