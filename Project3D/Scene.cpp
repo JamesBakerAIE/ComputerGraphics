@@ -41,7 +41,22 @@ void Scene::draw()
 		Instance* instance = *it;
 		instance->draw(this);
 	}
+}
 
+void Scene::loadScene(Scenes scenes)
+{
+	switch (scenes)
+	{
+	case Scenes::SpearModelScene:
+		
+		break;
+	case Scenes::BunnyModelScene:
+		break;
+	case Scenes::MultipleLightsScene:
+		break;
+	default:
+		break;
+	}
 }
 
 Light::Light(glm::vec3 pos, glm::vec3 col, float intensity)

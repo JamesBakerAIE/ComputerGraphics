@@ -7,6 +7,7 @@
 #include "OBJMesh.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "RenderTarget.h"
 
 class Instance;
 
@@ -37,12 +38,7 @@ protected:
 	aie::ShaderProgram m_shader;
 	aie::ShaderProgram m_normalMapShader;
 
-
-	Mesh m_quadMesh;
-	glm::mat4 m_quadTransform;
-
-	aie::OBJMesh m_bunnyMesh;
-	glm::mat4 m_bunnyTransform;
+	aie::RenderTarget m_renderTarget;
 
 	aie::OBJMesh m_spearMesh;
 	//glm::mat4 m_spearTransform;

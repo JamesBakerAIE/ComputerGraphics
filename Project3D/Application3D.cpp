@@ -13,10 +13,6 @@ using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
 
-
-
-
-
 Application3D::Application3D() {
 
 }
@@ -42,40 +38,6 @@ bool Application3D::startup() {
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
 	m_light.direction = { -1.0, -1.0, -1.0 };
 
-	m_texturedShader.loadShader(aie::eShaderStage::VERTEX,
-		"./shaders/textured.vert");
-	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT,
-		"./shaders/textured.frag");
-	if (m_texturedShader.link() == false) {
-		printf("Shader Error: %s\n",
-			m_texturedShader.getLastError());
-		return false;
-	}
-	if (m_gridTexture.load("./textures/numbered_grid.tga") == false) {
-		printf("Failed to load texture!\n");
-		return false;
-	}
-
-	m_shader.loadShader(aie::eShaderStage::VERTEX,
-		"./shaders/simple.vert");
-	m_shader.loadShader(aie::eShaderStage::FRAGMENT,
-		"./shaders/simple.frag");
-	if (m_shader.link() == false) {
-		printf("Shader Error: %s\n", m_shader.getLastError());
-		return false;
-	}
-
-
-	m_phongShader.loadShader(aie::eShaderStage::VERTEX,
-		"./shaders/phong.vert");
-	m_phongShader.loadShader(aie::eShaderStage::FRAGMENT,
-		"./shaders/phong.frag");
-	if (m_phongShader.link() == false) {
-		printf("Shader Error: %s\n", m_phongShader.getLastError());
-		return false;
-	}
-
-
 	m_normalMapShader.loadShader(aie::eShaderStage::VERTEX,
 		"./shaders/normalmap.vert");
 	m_normalMapShader.loadShader(aie::eShaderStage::FRAGMENT,
@@ -85,64 +47,22 @@ bool Application3D::startup() {
 		return false;
 	}
 
-
-
-
-	if (m_bunnyMesh.load("./stanford/Bunny.obj") == false) {
-		printf("Bunny Mesh Error!\n");
-		return false;
-	}
-
-	m_bunnyTransform = {
-	0.5f,0,0,0,
-	0,0.5f,0,0,
-	0,0,0.5f,0,
-	0,0,0,1
-	};
-
-
-	// create a simple quad
-	m_quadMesh.initialiseQuad();
-	// define a scale matrix for the quad
-	m_quadTransform = {
-	10,0,0,0,
-	0,10,0,0,
-	0,0,10,0,
-	0,0,0,1
-	};
-
-
 	if (m_spearMesh.load("./soulspear/soulspear.obj",
 		true, true) == false) {
 		printf("Soulspear Mesh Error!\n");
 		return false;
 	}
 
-	//glm::mat4 spearTransform = {
-	//1,0,0,0,
-	//0,1,0,0,
-	//0,0,1,0,
-	//0,0,0,1
-	//};
-	//m_spearInstance = new Instance(spearTransform, &m_spearMesh, &m_normalMapShader);
-
-	glm::mat4 spearTransform = 
-	{
-		1,0,0,0,
-		0,1,0,0,
-		0,0,1,0,
-		0,0,0,1
-	};
-
+	// Create scene
 	m_scene = new Scene(&m_camera, glm::vec2(getWindowWidth(),
 		getWindowHeight()), m_light, m_ambientLight);
 
+	// red light on the left
+	m_scene->getPointLights().push_back(Light(vec3(5, 3, 0), vec3(1, 1, 0), 50));
+	// green light on the right
+	m_scene->getPointLights().push_back(Light(vec3(-5, 3, 0), vec3(1, 1, 0), 50));
 
-	//// red light on the left
-	//m_scene->getPointLights().push_back(Light(vec3(5, 3, 0), vec3(1, 0, 0), 50));
-	//// green light on the right
-	//m_scene->getPointLights().push_back(Light(vec3(-5, 3, 0), vec3(0, 1, 0), 50));
-
+	// Create 10 spears
 	for (int i = 0; i < 10; i++)
 	{
 		m_scene->addInstance(new Instance(glm::vec3(i, 1, 1), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), &m_spearMesh,
@@ -160,20 +80,6 @@ void Application3D::shutdown() {
 
 void Application3D::update(float deltaTime) 
 {
-
-	// query time since application started
-	//float time = getTime();
-	//
-	//float time = 1;
-
-	//// rotate light
-	//m_light.direction = glm::normalize(vec3(glm::cos(time * 2),
-	//	glm::sin(time * 2), 0));
-
-	//// rotate camera
-	//m_viewMatrix = glm::lookAt(vec3(glm::sin(time) * 10, 10, glm::cos(time) * 10),
-	//						   vec3(0), vec3(0, 1, 0));
-
 	// wipe the gizmos clean for this frame
 	Gizmos::clear();
 
@@ -202,6 +108,12 @@ void Application3D::update(float deltaTime)
 		2.0f);
 	ImGui::End();
 
+	ImGui::Begin("Scene Settings");
+	if (ImGui::Button("Spear Model - Normal Maps & Specular Highlights", ImVec2(400, 50)))
+	{
+
+	}
+	ImGui::End();
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
@@ -217,79 +129,8 @@ void Application3D::draw() {
 	// update perspective in case window resized
 	m_projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(), getWindowHeight());
 	m_viewMatrix = m_camera.getViewMatrix();
-	// bind shader
-	//m_shader.bind();
-	// bind transform
-	//auto pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
-	//m_shader.bindUniform("ProjectionViewModel", pvm);
-
-	//// bind shader
-	//m_shader.bind();
-	//
-	//// bind transform
-	//auto pvm = m_projectionMatrix * m_viewMatrix * m_bunnyTransform;
-	//m_shader.bindUniform("ProjectionViewModel", pvm);
-
-	//
-	//// draw mesh
-	//m_bunnyMesh.draw();
-
-
-	//// bind phong shader program
-	//m_phongShader.bind();
-	//
-	//// bind light
-	//m_phongShader.bindUniform("AmbientColour", m_ambientLight);
-	//m_phongShader.bindUniform("LightColour", m_light.colour);
-	//m_phongShader.bindUniform("LightDirection", m_light.direction);
-
-	//
-	////// bind transform
-	////glm::mat4 projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(),
-	////	(float)getWindowHeight());
-	////glm::mat4 viewMatrix = m_camera.getViewMatrix();
-	//auto pvm = m_projectionMatrix * m_viewMatrix * m_bunnyTransform;
-	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
-	//
-	//// bind transforms for lighting
-	//m_phongShader.bindUniform("ModelMatrix", m_bunnyTransform);
-	//
-	//// draw bunny
-	////m_bunnyMesh.draw();
-
-	//m_normalMapShader.bind();
-	//// bind transform
-	//pvm = m_projectionMatrix * m_viewMatrix * m_spearTransform;
-	//m_normalMapShader.bindUniform("ProjectionViewModel", pvm);
-	//m_normalMapShader.bindUniform("ModelMatrix", m_spearTransform);
-
-	//m_normalMapShader.bindUniform("AmbientColour", m_ambientLight);
-	//m_normalMapShader.bindUniform("LightColour", m_light.colour);
-	//m_normalMapShader.bindUniform("LightDirection", m_light.direction);
-
-	//m_normalMapShader.bindUniform("cameraPosition", m_camera.getPosition());
-	//
-	//// draw mesh
-	//m_spearMesh.draw();
 
 	m_scene->draw();
-
-
-
-
-
-	//// bind shader
-	//m_texturedShader.bind();
-	//// bind transform
-	//pvm = m_projectionMatrix * m_viewMatrix * m_quadTransform;
-	//m_texturedShader.bindUniform("ProjectionViewModel", pvm);
-	//// bind texture location
-	//m_texturedShader.bindUniform("diffuseTexture", 1);
-	//// bind texture to specified location
-	//m_gridTexture.bind(1);
-	//// draw quad
-	//m_quadMesh.draw();
-
 	
 	// draw 3D gizmos
 	Gizmos::draw(m_projectionMatrix * m_viewMatrix);

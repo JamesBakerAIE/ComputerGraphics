@@ -36,9 +36,9 @@ void Instance::draw(Scene* scene)
 	auto pvm = scene->getCamera()->getProjectionMatrix(scene->getWindowSize().x,
 		scene->getWindowSize().y)
 		* scene->getCamera()->getViewMatrix() * m_transform;
+
+	// bind each uniform
 	m_shader->bindUniform("ProjectionViewModel", pvm);
-
-
 	m_shader->bindUniform("ModelMatrix", m_transform);
 	m_shader->bindUniform("AmbientColour", scene->getAmbientLight());
 	m_shader->bindUniform("LightColour", scene->getLight().colour);

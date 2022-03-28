@@ -16,6 +16,13 @@ struct Light
 	Light(glm::vec3 pos, glm::vec3 col, float intensity);
 };
 
+enum class Scenes
+{
+	SpearModelScene,
+	BunnyModelScene,
+	MultipleLightsScene,
+};
+
 
 class Scene
 {
@@ -27,6 +34,8 @@ public:
 	void addInstance(Instance* instance);
 
 	void draw();
+
+	void loadScene(Scenes scenes);
 	
 	glm::vec3 getAmbientLight() { return m_ambientLight; }
 	Camera* getCamera() { return m_camera; }
