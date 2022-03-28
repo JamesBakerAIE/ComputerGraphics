@@ -4,13 +4,18 @@
 #include <glm/glm.hpp>
 #include <glm/ext.hpp>
 #include <gl_core_4_4.h>
+#include "glm/vec3.hpp"
 #include <imgui.h>
-
+#include "Instance.h"
 
 using glm::vec3;
 using glm::vec4;
 using glm::mat4;
 using aie::Gizmos;
+
+
+
+
 
 Application3D::Application3D() {
 
@@ -35,6 +40,7 @@ bool Application3D::startup() {
 	// Lighting colors
 	m_light.colour = { 1, 1, 0 };
 	m_ambientLight = { 0.25f, 0.25f, 0.25f };
+	m_light.direction = { -1.0, -1.0, -1.0 };
 
 	m_texturedShader.loadShader(aie::eShaderStage::VERTEX,
 		"./shaders/textured.vert");
@@ -111,20 +117,45 @@ bool Application3D::startup() {
 		printf("Soulspear Mesh Error!\n");
 		return false;
 	}
-	m_spearTransform = {
-	1,0,0,0,
-	0,1,0,0,
-	0,0,1,0,
-	0,0,0,1
+
+	//glm::mat4 spearTransform = {
+	//1,0,0,0,
+	//0,1,0,0,
+	//0,0,1,0,
+	//0,0,0,1
+	//};
+	//m_spearInstance = new Instance(spearTransform, &m_spearMesh, &m_normalMapShader);
+
+	glm::mat4 spearTransform = 
+	{
+		1,0,0,0,
+		0,1,0,0,
+		0,0,1,0,
+		0,0,0,1
 	};
 
+	m_scene = new Scene(&m_camera, glm::vec2(getWindowWidth(),
+		getWindowHeight()), m_light, m_ambientLight);
+
+
+	//// red light on the left
+	//m_scene->getPointLights().push_back(Light(vec3(5, 3, 0), vec3(1, 0, 0), 50));
+	//// green light on the right
+	//m_scene->getPointLights().push_back(Light(vec3(-5, 3, 0), vec3(0, 1, 0), 50));
+
+	for (int i = 0; i < 10; i++)
+	{
+		m_scene->addInstance(new Instance(glm::vec3(i, 1, 1), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), &m_spearMesh,
+			&m_normalMapShader));
+	}
 
 	return true;
 }
 
 void Application3D::shutdown() {
 
-	//Gizmos::destroy();
+	Gizmos::destroy();
+	delete m_scene;
 }
 
 void Application3D::update(float deltaTime) 
@@ -165,9 +196,9 @@ void Application3D::update(float deltaTime)
 
 
 	ImGui::Begin("Light Settings");
-	ImGui::DragFloat3("Sunlight Direction", &m_light.direction[0], 0.1f, -1.0f,
+	ImGui::DragFloat3("Sunlight Direction", &m_scene->getLight().direction[0], 0.1f, -1.0f,
 		1.0f);
-	ImGui::DragFloat3("Sunlight Colour", &m_light.colour[0], 0.1f, 0.0f,
+	ImGui::DragFloat3("Sunlight Colour", &m_scene->getLight().colour[0], 0.1f, 0.0f,
 		2.0f);
 	ImGui::End();
 
@@ -204,42 +235,44 @@ void Application3D::draw() {
 	//m_bunnyMesh.draw();
 
 
-	// bind phong shader program
-	m_phongShader.bind();
-	
-	// bind light
-	m_phongShader.bindUniform("AmbientColour", m_ambientLight);
-	m_phongShader.bindUniform("LightColour", m_light.colour);
-	m_phongShader.bindUniform("LightDirection", m_light.direction);
+	//// bind phong shader program
+	//m_phongShader.bind();
+	//
+	//// bind light
+	//m_phongShader.bindUniform("AmbientColour", m_ambientLight);
+	//m_phongShader.bindUniform("LightColour", m_light.colour);
+	//m_phongShader.bindUniform("LightDirection", m_light.direction);
 
-	
+	//
+	////// bind transform
+	////glm::mat4 projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(),
+	////	(float)getWindowHeight());
+	////glm::mat4 viewMatrix = m_camera.getViewMatrix();
+	//auto pvm = m_projectionMatrix * m_viewMatrix * m_bunnyTransform;
+	//m_phongShader.bindUniform("ProjectionViewModel", pvm);
+	//
+	//// bind transforms for lighting
+	//m_phongShader.bindUniform("ModelMatrix", m_bunnyTransform);
+	//
+	//// draw bunny
+	////m_bunnyMesh.draw();
+
+	//m_normalMapShader.bind();
 	//// bind transform
-	//glm::mat4 projectionMatrix = m_camera.getProjectionMatrix(getWindowWidth(),
-	//	(float)getWindowHeight());
-	//glm::mat4 viewMatrix = m_camera.getViewMatrix();
-	auto pvm = m_projectionMatrix * m_viewMatrix * m_bunnyTransform;
-	m_phongShader.bindUniform("ProjectionViewModel", pvm);
-	
-	// bind transforms for lighting
-	m_phongShader.bindUniform("ModelMatrix", m_bunnyTransform);
-	
-	// draw bunny
-	//m_bunnyMesh.draw();
+	//pvm = m_projectionMatrix * m_viewMatrix * m_spearTransform;
+	//m_normalMapShader.bindUniform("ProjectionViewModel", pvm);
+	//m_normalMapShader.bindUniform("ModelMatrix", m_spearTransform);
 
-	m_normalMapShader.bind();
-	// bind transform
-	pvm = m_projectionMatrix * m_viewMatrix * m_spearTransform;
-	m_normalMapShader.bindUniform("ProjectionViewModel", pvm);
-	m_normalMapShader.bindUniform("ModelMatrix", m_spearTransform);
+	//m_normalMapShader.bindUniform("AmbientColour", m_ambientLight);
+	//m_normalMapShader.bindUniform("LightColour", m_light.colour);
+	//m_normalMapShader.bindUniform("LightDirection", m_light.direction);
 
-	m_normalMapShader.bindUniform("AmbientColour", m_ambientLight);
-	m_normalMapShader.bindUniform("LightColour", m_light.colour);
-	m_normalMapShader.bindUniform("LightDirection", m_light.direction);
+	//m_normalMapShader.bindUniform("cameraPosition", m_camera.getPosition());
+	//
+	//// draw mesh
+	//m_spearMesh.draw();
 
-	m_normalMapShader.bindUniform("cameraPosition", m_camera.getPosition());
-	
-	// draw mesh
-	m_spearMesh.draw();
+	m_scene->draw();
 
 
 

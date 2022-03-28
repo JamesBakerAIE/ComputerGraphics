@@ -6,6 +6,11 @@
 #include "Shader.h"
 #include "OBJMesh.h"
 #include "Camera.h"
+#include "Scene.h"
+
+class Instance;
+
+
 
 class Application3D : public aie::Application 
 {
@@ -40,16 +45,15 @@ protected:
 	glm::mat4 m_bunnyTransform;
 
 	aie::OBJMesh m_spearMesh;
-	glm::mat4 m_spearTransform;
+	//glm::mat4 m_spearTransform;
+
+	Instance* m_spearInstance;
 
 
-	struct Light
-	{
-		glm::vec3 direction;
-		glm::vec3 colour;
-	};
 	Light m_light;
 	glm::vec3 m_ambientLight;
 
 	Camera m_camera;
+
+	Scene* m_scene;
 };
