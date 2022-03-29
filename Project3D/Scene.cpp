@@ -5,6 +5,7 @@
 #include "glm/vec3.hpp"
 
 
+
 Scene::Scene(Camera* camera, glm::vec2 windowSize, Light& light, glm::vec3 ambientLight)
 {
 	m_camera = camera;
@@ -43,19 +44,22 @@ void Scene::draw()
 	}
 }
 
-void Scene::loadScene(Scenes scenes)
+void Scene::open(const char* filename, std::ios::openmode mode)
 {
-	switch (scenes)
+	std::ofstream openFile;
+	openFile.open(filename, mode);
+
+}
+
+void Scene::save(const char* filename, std::ios::openmode mode)
+{
+	std::ofstream saveFile;
+	
+	saveFile.open(filename, mode);
+
+	if (saveFile.is_open())
 	{
-	case Scenes::SpearModelScene:
-		
-		break;
-	case Scenes::BunnyModelScene:
-		break;
-	case Scenes::MultipleLightsScene:
-		break;
-	default:
-		break;
+		saveFile << this << std::endl;
 	}
 }
 

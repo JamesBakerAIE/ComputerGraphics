@@ -2,6 +2,8 @@
 #include <list>
 #include <glm/glm.hpp>
 #include <vector>
+#include <fstream>
+#include <iostream>
 
 class Camera;
 class Instance;
@@ -16,14 +18,6 @@ struct Light
 	Light(glm::vec3 pos, glm::vec3 col, float intensity);
 };
 
-enum class Scenes
-{
-	SpearModelScene,
-	BunnyModelScene,
-	MultipleLightsScene,
-};
-
-
 class Scene
 {
 public:
@@ -34,8 +28,6 @@ public:
 	void addInstance(Instance* instance);
 
 	void draw();
-
-	void loadScene(Scenes scenes);
 	
 	glm::vec3 getAmbientLight() { return m_ambientLight; }
 	Camera* getCamera() { return m_camera; }
@@ -45,6 +37,9 @@ public:
 	glm::vec3* getPointlightPositions() { return &m_pointLightPositions[0]; }
 	glm::vec3* getPointlightColours() { return &m_pointLightColours[0]; }
 	std::vector<Light>& getPointLights() { return m_pointLights; }
+
+	void open(const char* filename, std::ios::openmode mode);
+	void save(const char* filename, std::ios::openmode mode);
 
 protected:
 	Camera* m_camera;

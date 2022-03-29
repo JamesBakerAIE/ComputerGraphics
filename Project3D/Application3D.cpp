@@ -69,6 +69,8 @@ bool Application3D::startup() {
 			&m_normalMapShader));
 	}
 
+	//m_scene->save("testScene.dat", std::ios::app);
+
 	return true;
 }
 
@@ -108,12 +110,12 @@ void Application3D::update(float deltaTime)
 		2.0f);
 	ImGui::End();
 
-	ImGui::Begin("Scene Settings");
-	if (ImGui::Button("Spear Model - Normal Maps & Specular Highlights", ImVec2(400, 50)))
-	{
+	//ImGui::Begin("Scene Settings");
+	//if (ImGui::Button("Spear Model - Normal Maps & Specular Highlights", ImVec2(400, 50)))
+	//{
 
-	}
-	ImGui::End();
+	//}
+	//ImGui::End();
 	// quit if we press escape
 	aie::Input* input = aie::Input::getInstance();
 
