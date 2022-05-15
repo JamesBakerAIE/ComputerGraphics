@@ -47,6 +47,15 @@ bool Application3D::startup() {
 		return false;
 	}
 
+	m_texturedShader.loadShader(aie::eShaderStage::VERTEX,
+		"./shaders/textured.vert");
+	m_texturedShader.loadShader(aie::eShaderStage::FRAGMENT,
+		"./shaders/textured.frag");
+	if (m_texturedShader.link() == false) {
+		printf("Shader Error: %s\n", m_texturedShader.getLastError());
+		return false;
+	}
+
 	if (m_spearMesh.load("./soulspear/soulspear.obj",
 		true, true) == false) {
 		printf("Soulspear Mesh Error!\n");
@@ -68,6 +77,9 @@ bool Application3D::startup() {
 		m_scene->addInstance(new Instance(glm::vec3(i, 1, 1), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), &m_spearMesh,
 			&m_normalMapShader));
 	}
+
+	m_scene->addInstance(new Instance(glm::vec3(-5, 1, 1), glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), &m_spearMesh,
+		&m_texturedShader));
 
 	//m_scene->save("testScene.dat", std::ios::app);
 
